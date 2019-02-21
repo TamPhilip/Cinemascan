@@ -1,7 +1,10 @@
 import pandas as pd
 import json
+import os
 
-df = pd.read_csv('movie-data/movie.metadata.tsv',delimiter='\t',encoding='utf-8')
+path = os.path.abspath(os.curdir)
+
+df = pd.read_csv('{}/movie-data/movie.metadata.tsv'.format(path),delimiter='\t',encoding='utf-8')
 
 def get_genre_list(df):
     set_title = set()
@@ -56,7 +59,7 @@ def iterate_through_most(n_df, df, word_list, genre_list, plot_df):
 
 print(df['genres'])
 
-plot_df = pd.read_csv('movie-data/plot_summaries.txt', delimiter='\t')
+plot_df = pd.read_csv('{}/movie-data/plot_summaries.txt'.format(path), delimiter='\t')
 #
 # print(plot_df.head(10))
 #
@@ -74,13 +77,12 @@ list_title.append("Summary")
 
 n_df = pd.DataFrame(columns= list_title)
 
-n_df = iterate_through_most(n_df, df, word_list, genre_list,plot_df)
-# n_df = iterate_through_all(n_df, df, word_list, genre_list,plot_df)
+n_df = iterate_through_all(n_df, df, word_list, genre_list,plot_df)
 print(n_df.columns)
 
 print(len(n_df))
 print(n_df)
-n_df.to_csv(path_or_buf='movie-data-2.csv')
+n_df.to_csv(path_or_buf='{}/csv-data/movie-data.csv'.format(path))
 #
 
 
