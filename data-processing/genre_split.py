@@ -18,21 +18,43 @@ for x in movie_data:
 
 # Remove existing Crime Column
 movie_data.drop(columns=['Crime'], axis=1, inplace=True)
-# Choose Action, Comedy, Drama, Thriller, Horror
+
+# Choose Action, Comedy, Horror, Crime, Romance
 movie_data.rename(columns={'Romance Film': 'Romance', 'Crime Fiction': 'Crime'}, inplace=True)
 
-movie_data = movie_data[['Title', 'Summary', 'Action', 'Comedy', 'Drama', 'Thriller', 'Horror', 'Romance', 'Crime']]
+movie_data = movie_data[['Title',
+                         'Summary',
+                         'Action',
+                         'Comedy',
+                         'Drama',
+                         'Thriller',
+                         'Horror',
+                         'Romance',
+                         'Crime']]
 
 #select data
 
-movie_data = movie_data[(movie_data['Action'] == 1) | (movie_data['Comedy'] == 1) | (movie_data['Drama'] == 1) | (movie_data['Thriller'] == 1) | (movie_data['Horror'] == 1) | (movie_data['Romance'] == 1) | (movie_data['Crime'] == 1)]
+movie_data = movie_data[(movie_data['Action'] == 1) |
+                        (movie_data['Comedy'] == 1) |
+                        (movie_data['Drama'] == 1) |
+                        (movie_data['Thriller'] == 1) |
+                        (movie_data['Horror'] == 1) |
+                        (movie_data['Romance'] == 1) |
+                        (movie_data['Crime'] == 1)]
 
+print(len(movie_data))
 
 print(" \n SELECT DATA \n")
 
 
 def check(r, a, dr, co, th, ho, cr):
-    genres = ['Action', 'Comedy', 'Drama', 'Thriller', 'Horror', 'Romance', 'Crime']
+    genres = ['Action',
+              'Comedy',
+              'Drama',
+              'Thriller',
+              'Horror',
+              'Romance',
+              'Crime']
     movie = movie_data[
         (movie_data['Romance'] == r)
         & (movie_data['Action'] == a)
@@ -59,14 +81,14 @@ def check(r, a, dr, co, th, ho, cr):
     if len(movie) > 100:
         print(" {} : {}".format(genres, len(movie)))
 
-for a in range(2):
-    for b in range(2):
-        for c in range(2):
-            for d in range(2):
-                for e in range(2):
-                    for f in range(2):
-                        for g in range(2):
-                            check(a,b,c,d,e,f,g)
+for r in range(2):
+    for a in range(2):
+        for dr in range(2):
+            for co in range(2):
+                for th in range(2):
+                    for ho in range(2):
+                        for cr in range(2):
+                            check(r,a,dr,co,th,ho,cr)
 
 # action_movies.to_csv(path_or_buf='{}/csv-data/action-data.csv'.format(path))
 # comedy_movies.to_csv(path_or_buf='{}/csv-data/comedy-data.csv'.format(path))

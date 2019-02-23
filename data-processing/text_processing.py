@@ -2,17 +2,17 @@ import pandas as pd
 from nltk.corpus import stopwords
 import re
 import numpy as np
-from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import accuracy_score
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import LinearSVC
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model.logistic import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB
 import os
 
 path = os.path.abspath(os.curdir)
-
+from nltk.corpus import stopwords
 stop_words = set(stopwords.words('english'))
 stop_words = {x.replace("'","") for x in stop_words if re.search("[']", x.lower())}
 
@@ -21,7 +21,13 @@ print(len(movie_data))
 
 msk = np.random.rand(len(movie_data)) < 0.9
 
-genres = ['Action', 'Comedy', 'Drama', 'Thriller', 'Horror', 'Romance', 'Crime']
+genres = ['Action',
+          'Comedy',
+          'Drama',
+          'Thriller',
+          'Horror',
+          'Romance',
+          'Crime']
 
 train = movie_data[msk]
 train = np.split(train, [3], axis=1)
@@ -35,9 +41,8 @@ test[0].drop(columns='Unnamed: 0', inplace=True)
 test_features = test[0]['Summary'].values.astype('U')
 test_labels = test[1]
 
-def predict_model(type, model, vectorizer, train_labels, train_featuress, test_labels, test_features):
+def predict_model(type, model, vectorizer, train_labels, train_features, test_labels, test_features):
     print("\n {} \n".format(type))
-
     pipeline = Pipeline([
         ('vec', vectorizer),
         ('clf', model),
@@ -52,40 +57,10 @@ def predict_model(type, model, vectorizer, train_labels, train_featuress, test_l
         print('Test accuracy is {}'.format(accuracy_score(np.array(test_labels[genre]).astype('int'), prediction)))
 
 
-type = "Logistic Regression Count Vectorizer Freq"
-predict_model(type, OneVsRestClassifier(LogisticRegression(solver='sag', max_iter=2000), n_jobs=1),
-                                        CountVectorizer(stop_words=stop_words, binary=True),
-                                        train_labels,
-                                        train_features,
-                                        test_labels,
-                                        test_features)
-
-type = "Support Vector Machine Count Vectorizer Freq"
-predict_model(type, OneVsRestClassifier(LinearSVC(max_iter=5000), n_jobs=1),
-                                        CountVectorizer(stop_words=stop_words),
-                                        train_labels,
-                                        train_features,
-                                        test_labels,
-                                        test_features)
-
-type = "Logistic Regression Count Vectorizer Bin"
-predict_model(type, OneVsRestClassifier(LogisticRegression(solver='sag', max_iter=2000), n_jobs=1),
-                                        CountVectorizer(stop_words=stop_words, binary=True),
-                                        train_labels,
-                                        train_features,
-                                        test_labels,
-                                        test_features)
-
-type = "Support Vector Machine Count Vectorizer Bin"
-predict_model(type, OneVsRestClassifier(LinearSVC(max_iter=5000), n_jobs=1),
-                                        CountVectorizer(stop_words=stop_words,  binary=True),
-                                        train_labels,
-                                        train_features,
-                                        test_labels,
-                                        test_features)
+#TFIdVectorizer = CountVectorizer + TfidTransformer (Normalizing)
 
 type = "Logistic Regression TfidVectorizer"
-predict_model(type, OneVsRestClassifier(LogisticRegression(solver='sag', max_iter=2000), n_jobs=1),
+predict_model(type, OneVsRestClassifier(LogisticRegression(solver='sag'), n_jobs=1),
                                         TfidfVectorizer(stop_words=stop_words),
                                         train_labels,
                                         train_features,
@@ -93,10 +68,17 @@ predict_model(type, OneVsRestClassifier(LogisticRegression(solver='sag', max_ite
                                         test_features)
 
 type = "Support Vector Machine TfidVectorizer"
-predict_model(type, OneVsRestClassifier(LinearSVC(max_iter=5000), n_jobs=1),
+predict_model(type, OneVsRestClassifier(LinearSVC(), n_jobs=1),
                                         TfidfVectorizer(stop_words=stop_words),
                                         train_labels,
                                         train_features,
                                         test_labels,
                                         test_features)
 
+type = "Naive Bayes TfidVectorizer"
+predict_model(type, OneVsRestClassifier(MultinomialNB(fit_prior=True, class_prior=None), n_jobs=1),
+                                        TfidfVectorizer(stop_words=stop_words),
+                                        train_labels,
+                                        train_features,
+                                        test_labels,
+                                        test_features)
