@@ -88,8 +88,44 @@ def create_train_model(genre):
 
 action_model = create_train_model('Action')
 comedy_model = create_train_model('Comedy')
-#%% Run Prediction
+#%% Run Test
+y = movie_data[1]['Action']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True)
+print(X_test)
+#%% Run Test
+print("Prediction")
+action_pred = action_model.predict(X_test)
 
+print(type(action_pred.argmax(axis=1)))
+print(y_test.values)
+print(type(y_test.values))
+action_matrix = confusion_matrix(y_test.values.tolist(), np.rint(action_pred.flatten()).tolist())
+
+
+y = movie_data[1]['Comedy']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True)
+comedy_pred = comedy_model.predict(X_test)
+print(comedy_pred)
+comedy_matrix = confusion_matrix(y_test.values.tolist(), np.rint(comedy_pred.flatten()).tolist())
+print(action_matrix)
+print(comedy_matrix)
+
+#%% Create Graph
+plt.title('Actual')
+seaborn.set(font_scale=1.1)#for label size
+df_action = pd.DataFrame(action_matrix, index = ['Action', 'N Action'],
+                         columns=['Action', 'N Action'])
+sb = seaborn.heatmap(df_action, annot=True, fmt='g').xaxis.set_ticks_position('top')
+plt.ylabel('Predicted')
+plt.show()
+
+plt.title('Actual')
+df_comedy = pd.DataFrame(comedy_matrix, index = ['Comedy', 'Not Com'],
+                         columns=['Comedy', 'Not Com'])
+sb = seaborn.heatmap(df_comedy, annot=True, fmt='g').xaxis.set_ticks_position('top')
+plt.ylabel('Predicted')
+plt.show()
+#%% Run Second Prediction
     # cm = confusion_matrix(y_test,pred)
     # df_cm = pd.DataFrame(cm, index = [genre, "not {}".format(genre)], columns=[genre, "not {}".format(genre)])
     # seaborn.set(font_scale=1.4)
