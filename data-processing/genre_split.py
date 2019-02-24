@@ -6,7 +6,7 @@ import os
 
 path = os.path.abspath(os.curdir)
 
-movie_data = pd.read_csv('{}/csv-data/movie-data.csv'.format(path))
+movie_data = pd.read_csv('{}/../csv-data/movie-data.csv'.format(path))
 
 print(" \n BEFORE DATA CLEAN \n")
 print(len(movie_data))
@@ -25,6 +25,7 @@ movie_data.rename(columns={'Romance Film': 'Romance', 'Crime Fiction': 'Crime'},
 movie_data = movie_data[['Title',
                          'Summary',
                          'Action',
+                         'Adventure',
                          'Comedy',
                          'Drama',
                          'Thriller',
@@ -37,6 +38,7 @@ movie_data = movie_data[['Title',
 movie_data = movie_data[(movie_data['Action'] == 1) |
                         (movie_data['Comedy'] == 1) |
                         (movie_data['Drama'] == 1) |
+                        (movie_data['Adventure'] == 1) |
                         (movie_data['Thriller'] == 1) |
                         (movie_data['Horror'] == 1) |
                         (movie_data['Romance'] == 1) |
@@ -103,6 +105,6 @@ movie_data['Summary'] = movie_data['Summary'].str.lower().replace("(\|.*>)|(<.*>
 movie_data['Summary'] = movie_data['Summary'].str.lower().replace('["\'#$%&()*+,-/:;<=>@[\\]^_`{|}~\t\n]',' ', regex=True)
 movie_data['Summary'] = movie_data['Summary'].str.lower().replace('[-,"]', ' ', regex=True)
 
-np.savetxt("summaries.txt", list(enumerate(movie_data['Summary'])), delimiter=" ", newline = "\n \n \n", fmt="%s")
+# np.savetxt("summaries.txt", list(enumerate(movie_data['Summary'])), delimiter=" ", newline = "\n \n \n", fmt="%s")
 #
-movie_data.to_csv(path_or_buf='{}/csv-data/movie-data-cleaned.csv'.format(path))
+movie_data.to_csv('../csv-data/movie-data-cleaned.csv')
