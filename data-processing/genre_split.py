@@ -107,4 +107,4 @@ movie_data['Summary'] = movie_data['Summary'].str.lower().replace('[-,"]', ' ', 
 
 # np.savetxt("summaries.txt", list(enumerate(movie_data['Summary'])), delimiter=" ", newline = "\n \n \n", fmt="%s")
 #
-movie_data.to_csv('../csv-data/movie-data-cleaned.csv')
+movie_data.to_csv('final_data.csv')

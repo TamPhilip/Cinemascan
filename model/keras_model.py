@@ -40,7 +40,7 @@ X = pad_sequences(sequences, maxlen=max_len)
 
 epochs = 10
 emb_dim = 128
-batch_size = 32
+batch_size = 16
 
 #%% Run Changes
 genres = ['Action',
