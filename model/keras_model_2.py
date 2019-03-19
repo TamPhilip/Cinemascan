@@ -12,10 +12,7 @@ import pandas as pd
 import os
 import re
 from sklearn.model_selection import train_test_split
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics import confusion_matrix
 from keras.preprocessing.sequence import pad_sequences
-from keras.utils.np_utils import to_categorical
 from keras.callbacks import EarlyStopping
 from keras.preprocessing.text import Tokenizer
 from keras.layers import Dense, Embedding, LSTM, SpatialDropout1D

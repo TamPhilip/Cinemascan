@@ -7,23 +7,26 @@ Original file is located at
     https://colab.research.google.com/drive/1lZukElZvOgUVEnUaGDOHZEleLMwc6eaM
 """
 import h5py
+import time
 import numpy as np
 import pandas as pd
 import os
 import re
 from sklearn.model_selection import train_test_split
-
-from numpy import array
-from numpy import argmax
-from keras.utils import to_categorical
-from numpy import array
-from numpy import argmax
-from keras.utils import to_categorical
+import gensim
+#
+# from numpy import array
+# from numpy import argmax
+# from keras.utils import to_categorical
+# from numpy import array
+# from numpy import argmax
+# from keras.utils import to_categorical
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics import confusion_matrix
-from sklearn.preprocessing import normalize
-from keras.preprocessing.sequence import pad_sequences
-from keras.utils.np_utils import to_categorical
+from sklearn.feature_extraction.text import CountVectorizer
+# from sklearn.metrics import confusion_matrix
+# from sklearn.preprocessing import normalize
+# from keras.preprocessing.sequence import pad_sequences
+# from keras.utils.np_utils import to_categorical
 from keras.callbacks import EarlyStopping
 from keras.preprocessing.text import Tokenizer
 from keras.layers import Dense, Embedding, LSTM, SpatialDropout1D
@@ -32,7 +35,7 @@ from nltk.corpus import stopwords
 from keras.layers import Bidirectional
 import matplotlib.pyplot as plt
 import tensorflow as tf
-import numpy
+# import numpy
 sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
 path = os.path.abspath(os.curdir)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -187,9 +190,9 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 #                                 counat += check(r, a, dr, co, th, ad, my, fa, cr)
 # print(counat)
 # movie_data.to_csv('final_data.csv')
-#%%
 
-movie_data = pd.read_csv('{}/../csv-data/final_data.csv'.format(path))
+#%%
+movie_data = pd.read_csv('{}/csv-data/final_data.csv'.format(path))
 df_final = movie_data
 
 df_final.drop(['Unnamed: 0'], axis=1, inplace=True)
@@ -202,15 +205,43 @@ stop_words = {x.replace("'","") for x in stop_words if re.search("[']", x.lower(
 
 print("Here")
 movie_data = np.split(df_final, [1], axis=1)
+y_data = movie_data[1]
 features = movie_data[0]['plot'].values
-print("here")
-encoded = to_categorical(features)
 
-n_most_common_words = 10000
-max_len = max([len(s.split()) for s in features])
-encoded_docs = [one_hot(f, n_most_common_words) for f in features]
+features
+print(features)
 
-X = pad_sequences(encoded_docs, maxlen=max_len, padding='post')
+#%%
+def train_word2vec_model(data, docLabels, size=300, sample=0.000001, dm=0, hs=1, window=10, min_count=0, workers=8,
+                        alpha=0.024, min_alpha=0.024, epoch=15, save_file='word2vec.w2v'):
+    startime = time.time()
+
+    print("{0} articles loaded for model".format(len(data)))
+
+    model = gensim.models.Word2Vec(size=size, sample=sample, window=window, min_count=min_count, workers=workers,
+                                  alpha=alpha, min_alpha=min_alpha, hs=hs)  # use fixed learning rate
+    model.build_vocab(features)
+
+    for epoch in range(epoch):
+        print("Training epoch {}".format(epoch + 1))
+        model.train(features, total_examples=model.corpus_count, epochs=model.iter)
+        # uncomment the folowing lines if you want to set the decrease of the learning rate manually
+        # be carefull to set-up model.alpha accordingly, depending on the number of epochs and initial alpha value.
+        # Modified on 12 April 2018 - thanks to Alex Henry
+
+        # model.alpha -= 0.002 # decrease the learning rate
+        # model.min_alpha = model.alpha # fix the learning rate, no decay
+
+    # saving the created model
+    model.save(os.path.join(save_file))
+    return model
+    print('model saved')
+
+#%%
+
+model = train_word2vec_model(features, y_data.values, size=len(features))
+
+# X = pad_sequences(encoded_docs, maxlen=max_len, padding='post')
 
 # X = normalize(X)
 
@@ -219,19 +250,26 @@ emb_dim = 128
 batch_size = 32
 
 #%%
-# print(encoded_docs)
-print(X)
+d2v_model = gensim.models.Word2Vec.load('word2vec.w2v')
+word_vectors = d2v_model.wv
+del model
+del d2v_model
+
+word_vectors.vectors
+print(len(word_vectors.vectors))
 #%% Run Changes
 def create_train_model(genre):
-    y = movie_data[1][genre]
+    y = y_data[genre]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True)
+    X_train, X_test, y_train, y_test = train_test_split(word_vectors.vectors, y, test_size=0.2, shuffle=True)
 
+    print("here)")
     model = Sequential()
     model.add(Embedding(n_most_common_words, emb_dim, input_length=X.shape[1]))
     model.add(SpatialDropout1D(0.7))
     model.add(Bidirectional(LSTM(30, recurrent_dropout=0.7)))
     model.add(Dense(1, activation='sigmoid'))
+    print("Start")
     model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
     print(model.summary())
     history = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size,validation_data=(X_test, y_test),callbacks=[EarlyStopping(monitor='val_loss',patience=7, min_delta=0.0001)])
@@ -255,6 +293,7 @@ def create_train_model(genre):
 
     return model
 #%% Run Action
+print("Starting")
 action_model = create_train_model('Action')
 action_model.save('action_model.h5')
 #%% Run Adventure
