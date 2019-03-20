@@ -205,7 +205,7 @@ X = pad_sequences(sequences, maxlen=max_len)
 
 epochs = 10
 emb_dim = 128
-batch_size = 64
+batch_size = 32
 
 #%% Run Changes
 def create_train_model(genre):

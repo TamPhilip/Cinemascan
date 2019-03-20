@@ -192,7 +192,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 # movie_data.to_csv('final_data.csv')
 
 #%%
-movie_data = pd.read_csv('{}/csv-data/final_data.csv'.format(path))
+movie_data = pd.read_csv('{}/../csv-data/final_data.csv'.format(path))
 df_final = movie_data
 
 df_final.drop(['Unnamed: 0'], axis=1, inplace=True)
@@ -203,69 +203,33 @@ df_final.shape
 stop_words = set(stopwords.words('english'))
 stop_words = {x.replace("'","") for x in stop_words if re.search("[']", x.lower())}
 
+vectorizer = TfidfVectorizer(max_features=2500, ngram_range=(1, 2))
 print("Here")
 movie_data = np.split(df_final, [1], axis=1)
 y_data = movie_data[1]
 features = movie_data[0]['plot'].values
-
-features
-print(features)
-
-#%%
-def train_word2vec_model(data, docLabels, size=300, sample=0.000001, dm=0, hs=1, window=10, min_count=0, workers=8,
-                        alpha=0.024, min_alpha=0.024, epoch=15, save_file='word2vec.w2v'):
-    startime = time.time()
-
-    print("{0} articles loaded for model".format(len(data)))
-
-    model = gensim.models.Word2Vec(size=size, sample=sample, window=window, min_count=min_count, workers=workers,
-                                  alpha=alpha, min_alpha=min_alpha, hs=hs)  # use fixed learning rate
-    model.build_vocab(features)
-
-    for epoch in range(epoch):
-        print("Training epoch {}".format(epoch + 1))
-        model.train(features, total_examples=model.corpus_count, epochs=model.iter)
-        # uncomment the folowing lines if you want to set the decrease of the learning rate manually
-        # be carefull to set-up model.alpha accordingly, depending on the number of epochs and initial alpha value.
-        # Modified on 12 April 2018 - thanks to Alex Henry
-
-        # model.alpha -= 0.002 # decrease the learning rate
-        # model.min_alpha = model.alpha # fix the learning rate, no decay
-
-    # saving the created model
-    model.save(os.path.join(save_file))
-    return model
-    print('model saved')
-
-#%%
-
-model = train_word2vec_model(features, y_data.values, size=len(features))
-
-# X = pad_sequences(encoded_docs, maxlen=max_len, padding='post')
-
-# X = normalize(X)
+X = vectorizer.fit_transform(features).toarray()
+del features
+del movie_data
+del df_final
 
 epochs = 10
 emb_dim = 128
 batch_size = 32
 
 #%%
-d2v_model = gensim.models.Word2Vec.load('word2vec.w2v')
-word_vectors = d2v_model.wv
-del model
-del d2v_model
 
-word_vectors.vectors
-print(len(word_vectors.vectors))
+print(X.shape)
+
 #%% Run Changes
 def create_train_model(genre):
     y = y_data[genre]
 
-    X_train, X_test, y_train, y_test = train_test_split(word_vectors.vectors, y, test_size=0.2, shuffle=True)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True)
 
     print("here)")
     model = Sequential()
-    model.add(Embedding(n_most_common_words, emb_dim, input_length=X.shape[1]))
+    model.add(Embedding(2500, emb_dim, input_length=X.shape[1]))
     model.add(SpatialDropout1D(0.7))
     model.add(Bidirectional(LSTM(30, recurrent_dropout=0.7)))
     model.add(Dense(1, activation='sigmoid'))
