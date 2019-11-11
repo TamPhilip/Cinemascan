@@ -1,4 +1,9 @@
 #%%
+"""
+Analyze model:
+Meant to analyze each models and their p[erformance
+"""
+
 import h5py
 import matplotlib.pyplot as plt
 import seaborn
@@ -12,27 +17,33 @@ from sklearn.metrics import confusion_matrix
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 #%%
-df = pd.read_csv('{}/csv-data/final_data.csv'.format(path))
+df = pd.read_csv('{}/csv-data/movie-data.csv'.format(path))
 df.drop(columns='Unnamed: 0', inplace=True)
-action_model = load_model('{}/model_version/n_most/action_model.h5'.format(path))
-adventure_model = load_model('{}/model_version/n_most/adventure_model.h5'.format(path))
-comedy_model = load_model('{}/model_version/n_most/comedy_model.h5'.format(path))
-crime_model = load_model('{}/model_version/n_most/crime_model.h5'.format(path))
-family_model = load_model('{}/model_version/n_most/family_model.h5'.format(path))
-mystery_model = load_model('{}/model_version/n_most/mystery_model.h5'.format(path))
-romance_model = load_model('{}/model_version/n_most/romance_model.h5'.format(path))
-thriller_model = load_model('{}/model_version/n_most/thriller_model.h5'.format(path))
+# action_model = load_model('{}/model_version/n_most/action_model.h5'.format(path))
+# adventure_model = load_model('{}/model_version/n_most/adventure_model.h5'.format(path))
+# comedy_model = load_model('{}/model_version/n_most/comedy_model.h5'.format(path))
+# crime_model = load_model('{}/model_version/n_most/crime_model.h5'.format(path))
+# family_model = load_model('{}/model_version/n_most/family_model.h5'.format(path))
+# mystery_model = load_model('{}/model_version/n_most/mystery_model.h5'.format(path))
+# romance_model = load_model('{}/model_version/n_most/romance_model.h5'.format(path))
+# thriller_model = load_model('{}/model_version/n_most/thriller_model.h5'.format(path))
+#%%
+print(df.head())
+
 #%%
 features = df['plot'].values
 
 n_most_common_words = 10000
 max_len = 500
 tokenizer = Tokenizer(num_words=n_most_common_words, lower=True)
+
 tokenizer.fit_on_texts(features)
 sequences = tokenizer.texts_to_sequences(features)
 word_index = tokenizer.word_index
 print('Found %s unique tokens.' % len(word_index))
+# print(word_index)
 X = pad_sequences(sequences, maxlen=500)
+# print(X)
 
 #%%
 models = {"Action": action_model,
