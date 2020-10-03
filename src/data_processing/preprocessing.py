@@ -109,13 +109,55 @@ class Preprocessing:
         return pd.concat(df_1[co_to_keep], df_2[co_to_keep])
 
 
-    # TODO: Count the genres for each
+    # TODO: Count the genres for imdb dataset
     @staticmethod
-    def count_genre(df):
+    def count_genres_imdb(df):
         """
         
-        :param df: 
-        :return: 
-        """
-        print()
 
+        
+        :param df:
+        :return:
+        """
+
+    @staticmethod
+    def keep_columns(df, bound, keep_columns):
+        """
+
+        Returns the columns with at least 5000 movies of that genre
+
+        :param df: Data Frame
+        :param bound: Int - Determines the amount needed to be added as a column to keep
+        :param keep_columns: List(Strings) - List of Strings to keep
+        :return: columns : List(Strings) - List of columns to keep
+        """
+
+        columns = keep_columns
+        for genre in df:
+            count = len(df[df[genre] == 1])
+            if count > bound:
+                columns.append(genre)
+        return columns
+
+
+    @staticmethod
+    def clean_text_for_training(df, column):
+        """
+        Strips off all special characters and lower cases all characters from a column of a dataframe.
+
+        :param df: Data Frame
+        :param column: String - Column to strip
+        :return: Data Frame
+        """
+        df_c = df.copy()
+        df_c[column] = df_c[column].str.lower().replace('[?!]', '.', regex=True)
+        df_c[column] = df_c[column].str.lower().replace(
+            "[\\\{\}\[\]\)\(\*\:]+|(\W+plot\W+)|(['’]s)|http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+|(cite (web|news|book))",
+            '', regex=True)
+        df_c[column] = df_c[column].str.lower().replace(
+            "(\|.*>)|(<.*>?)|(quote box)|(plot\W)|^(plot|introduction|beginning)\W|.citation$|.fact$|(\.\w*\W+\w*)$|[>$'’]|(\w*[;&|]+\w*)+|\s(\d)+",
+            '', regex=True)
+        df_c[column] = df_c[column].str.lower().replace('["\'#$%&()*+,-/:;<=>@[\\]^_`{|}~\t\n]', ' ',
+                                                        regex=True)
+        df_c[column] = df_c[column].str.lower().replace('[-,"]', ' ', regex=True)
+        return df_c

@@ -7,7 +7,7 @@ import pandas as pd
 import os
 import re
 from sklearn.model_selection import train_test_split
-import gensim
+
 #
 # from numpy import array
 # from numpy import argmax

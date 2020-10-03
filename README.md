@@ -4,11 +4,11 @@
 
 ### What is Cinemascan?
 
-A movie plot genre classifier using the CMU Movie Summary Corpus Dataset and IMDB Dataset!
+A movie text analyzer using the CMU Movie Summary Corpus Dataset and IMDB Dataset!
 
-The project was initially created as a Final Project for MAIS202, but wanting to continue it, I decided to work on it more!
+The project was created as a Final Project for MAIS202, and is being continued!
 
-If you have questions about the project or recommendations email me at philip.tam.code@gmail.com or add me on Linkedin: https://www.linkedin.com/in/philiptamcode/
+# If you have questions about the project or recommendations email me at philip.tam.code@gmail.com or add me on Linkedin: https://www.linkedin.com/in/philiptamcode/
 
 ### Model 
 

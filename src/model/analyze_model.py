@@ -1,7 +1,7 @@
 #%%
 """
 Analyze model:
-Meant to analyze each models and their p[erformance
+Meant to analyze each models and their performance
 """
 
 import h5py
